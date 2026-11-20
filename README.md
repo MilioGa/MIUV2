@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="app/src/main/res/drawable-nodpi/ic_logo.png" width="130" alt="MIUV2">
+<img src="docs/icon.png" width="140" alt="MIUV2">
 
 # MIUV2
 
@@ -14,7 +14,7 @@ Tareas de Eminus, horario, calendario escolar y credencial digital en una sola a
 ![Offline](https://img.shields.io/badge/funciona-sin%20internet-1FA463?style=flat-square)
 ![Usabilidad](https://img.shields.io/badge/Nielsen-10%20heurísticas-2ea44f?style=flat-square)
 
-[Características](#-características) · [Instalación](#-instalación) · [Cómo funciona](#-cómo-funciona) · [Desarrollo](#-desarrollo)
+[Características](#características) · [Instalación](#instalación) · [Cómo funciona](#cómo-funciona) · [Desarrollo](#desarrollo)
 
 </div>
 
@@ -23,13 +23,13 @@ Tareas de Eminus, horario, calendario escolar y credencial digital en una sola a
 > Abres la app y ves de un vistazo **qué clases tienes hoy** y **qué tareas te faltan**.
 > Entregas desde el celular y, si no hay señal, la entrega se envía sola cuando vuelva el internet.
 
-## ✨ Características
+## Características
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-### 📚 Eminus integrado
+### Eminus integrado
 - Tareas **pendientes, entregadas y vencidas** de todos tus cursos
 - **Entrega desde la app**: elige el archivo, agrega un comentario y listo
 - Reconoce las **entregas en equipo**
@@ -39,7 +39,7 @@ Tareas de Eminus, horario, calendario escolar y credencial digital en una sola a
 </td>
 <td width="50%" valign="top">
 
-### 🗓️ Horario de clases
+### Horario de clases
 - Se lee de **MiUV** con todos los días de cada materia
 - Salón, edificio y académico de cada clase
 - **Desliza** entre días de la semana
@@ -51,7 +51,7 @@ Tareas de Eminus, horario, calendario escolar y credencial digital en una sola a
 <tr>
 <td valign="top">
 
-### 📅 Calendario escolar
+### Calendario escolar
 - Tomado del **calendario oficial** de la UV
 - Inicio y fin de clases, exámenes, vacaciones, días festivos
 - Filtros por tipo y agrupado por mes
@@ -60,7 +60,7 @@ Tareas de Eminus, horario, calendario escolar y credencial digital en una sola a
 </td>
 <td valign="top">
 
-### 🪪 Credencial digital
+### Credencial digital
 - Captura de tu **credencial de MiUV** completa
 - Código QR con tu matrícula
 - Sube el brillo al mostrarla y se abre a pantalla completa
@@ -70,7 +70,7 @@ Tareas de Eminus, horario, calendario escolar y credencial digital en una sola a
 </tr>
 </table>
 
-## 📦 Instalación
+## Instalación
 
 1. Descarga `MIUV2.apk` desde [**Releases**](https://github.com/MilioGa/MIUV2/releases).
 2. Ábrelo en tu celular y permite **instalar apps de origen desconocido** si te lo pide.
@@ -78,7 +78,7 @@ Tareas de Eminus, horario, calendario escolar y credencial digital en una sola a
 
 > Solo necesitas internet la primera vez. Después todo queda guardado en tu teléfono.
 
-## 🔍 Cómo funciona
+## Cómo funciona
 
 | Sección | De dónde viene |
 |---|---|
@@ -86,7 +86,7 @@ Tareas de Eminus, horario, calendario escolar y credencial digital en una sola a
 | **Horario y credencial** | MiUV, leído en segundo plano (no tienes que navegar) |
 | **Calendario** | Calendario escolar oficial publicado en uv.mx |
 
-**🔒 Privacidad:** tu contraseña se guarda **cifrada con el Android Keystore** y solo en tu teléfono. La app no tiene servidor propio: habla directo con Eminus y MiUV. Al cerrar sesión se borra todo.
+**Privacidad:** tu contraseña se guarda **cifrada con el Android Keystore** y solo en tu teléfono. La app no tiene servidor propio: habla directo con Eminus y MiUV. Al cerrar sesión se borra todo.
 
 <details>
 <summary><b>Navegación</b></summary>
@@ -97,7 +97,7 @@ Tareas de Eminus, horario, calendario escolar y credencial digital en una sola a
 
 </details>
 
-## 🛠 Desarrollo
+## Desarrollo
 
 Requiere **JDK 21** y el **Android SDK 35**.
 
@@ -129,14 +129,14 @@ app/src/main/java/mx/uv/miuv2/
 
 </details>
 
-## 🧱 Hecho con
+## Hecho con
 
-[Kotlin](https://kotlinlang.org/) · [Jetpack Compose](https://developer.android.com/jetpack/compose) · [Material 3](https://m3.material.io/) · [OkHttp](https://square.github.io/okhttp/) · [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) · [ZXing](https://github.com/zxing/zxing) · [Claude Code](https://claude.com/claude-code)
+[Kotlin](https://kotlinlang.org/) · [Jetpack Compose](https://developer.android.com/jetpack/compose) · [Material 3](https://m3.material.io/) · [OkHttp](https://square.github.io/okhttp/) · [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) · [ZXing](https://github.com/zxing/zxing)
 
 > Proyecto independiente de estudiantes. No está afiliado ni respaldado por la Universidad Veracruzana.
 
 ---
 
 <div align="center">
-<sub>Hecho con 💙💚 por <a href="https://github.com/MilioGa">MilioGa</a></sub>
+<sub>Hecho por <a href="https://github.com/MilioGa">MilioGa</a></sub>
 </div>
