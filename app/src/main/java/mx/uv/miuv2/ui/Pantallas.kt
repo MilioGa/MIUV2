@@ -333,6 +333,17 @@ fun Ajustes(onCerrar: () -> Unit, onSalir: () -> Unit, onAyuda: () -> Unit) {
                 Dato(Icons.Rounded.Badge, "Usuario", Repo.usuario())
             }
             Spacer(Modifier.height(12.dp))
+            Text("Notificaciones", style = MaterialTheme.typography.titleMedium)
+            var cierre by remember { mutableStateOf(Repo.avisarCierre) }
+            var nuevas by remember { mutableStateOf(Repo.avisarNuevas) }
+            ListItem(headlineContent = { Text("Recordatorio antes del cierre") },
+                supportingContent = { Text("24 horas y 2 horas antes, si aún no la entregas") },
+                leadingContent = { Icon(Icons.Rounded.Alarm, null) },
+                trailingContent = { Switch(cierre, { cierre = it; Repo.avisarCierre = it }) })
+            ListItem(headlineContent = { Text("Tareas nuevas") },
+                supportingContent = { Text("Avisa cuando un profesor publica una tarea") },
+                leadingContent = { Icon(Icons.Rounded.NotificationsActive, null) },
+                trailingContent = { Switch(nuevas, { nuevas = it; Repo.avisarNuevas = it }) })
             ListItem(headlineContent = { Text("Ayuda y preguntas frecuentes") }, leadingContent = { Icon(Icons.Rounded.HelpOutline, null) },
                 modifier = Modifier.clickable(onClick = onAyuda))
             ListItem(headlineContent = { Text("Cerrar sesión", color = MaterialTheme.colorScheme.error) },
@@ -340,7 +351,7 @@ fun Ajustes(onCerrar: () -> Unit, onSalir: () -> Unit, onAyuda: () -> Unit) {
                 leadingContent = { Icon(Icons.Rounded.Logout, null, tint = MaterialTheme.colorScheme.error) },
                 modifier = Modifier.clickable { confirmar = true })
             Spacer(Modifier.height(8.dp))
-            Text("MIUV2 2.0 · App independiente, no oficial de la Universidad Veracruzana.", style = MaterialTheme.typography.bodySmall,
+            Text("MIUV2 2.1 · App independiente, no oficial de la Universidad Veracruzana.", style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }

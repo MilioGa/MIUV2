@@ -1,5 +1,8 @@
 package mx.uv.miuv2.data
 
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -60,6 +63,7 @@ object Repo {
         _sync.value = Sync(ultima = prefs.getLong("ultima", 0))
         val cm = app.getSystemService(ConnectivityManager::class.java)
         online.value = hayInternet()
+        if (sesionIniciada) programarAvisos()
         cm.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(n: android.net.Network) { online.value = true }
             override fun onLost(n: android.net.Network) { online.value = hayInternet() }
@@ -80,6 +84,7 @@ object Repo {
         Vault.save(app, user.trim(), pass.trim())
         nombre.value = n.toTitle()
         prefs.edit().putString("nombre", nombre.value).apply()
+        programarAvisos()
     }
 
     fun cerrarSesion() {
@@ -109,14 +114,7 @@ object Repo {
             _sync.value = _sync.value.copy(cargando = true, error = null, mensaje = "Conectando con Eminus…")
             val errores = mutableListOf<String>()
             runCatching {
-                val cursos = conSesion { it.cursos() }
-                val lista = mutableListOf<Tarea>()
-                cursos.forEachIndexed { i, c ->
-                    _sync.value = _sync.value.copy(mensaje = "Revisando ${c.nombre.take(28)} (${i + 1}/${cursos.size})")
-                    runCatching { conSesion { it.tareas(c) } }.onSuccess { lista += it }
-                }
-                tareas.value = lista.sortedBy { it.fin ?: Long.MAX_VALUE }
-                escribir("tareas.json", tareas.value.toJsonArray { it.toJson() }.toString())
+                descargarTareas { i, n, c -> _sync.value = _sync.value.copy(mensaje = "Revisando ${c.take(28)} ($i/$n)") }
                 if (nombre.value.isBlank()) conSesion { it.nombreUsuario() }.takeIf { it.isNotBlank() }?.let {
                     nombre.value = it.toTitle(); prefs.edit().putString("nombre", nombre.value).apply() }
             }.onFailure { errores += "Eminus: ${it.message}" }
@@ -126,6 +124,63 @@ object Repo {
             prefs.edit().putLong("ultima", ahora).apply()
             _sync.value = Sync(false, null, errores.joinToString("\n").ifBlank { null }, ahora)
         }
+    }
+
+    @Synchronized private fun descargarTareas(progreso: (Int, Int, String) -> Unit = { _, _, _ -> }) {
+        val cursos = conSesion { it.cursos() }
+        val lista = mutableListOf<Tarea>()
+        cursos.forEachIndexed { i, c ->
+            progreso(i + 1, cursos.size, c.nombre)
+            runCatching { conSesion { it.tareas(c) } }.onSuccess { lista += it }
+        }
+        tareas.value = lista.sortedBy { it.fin ?: Long.MAX_VALUE }
+        escribir("tareas.json", tareas.value.toJsonArray { it.toJson() }.toString())
+        revisarAvisos()
+    }
+
+    // ---- Notificaciones: recordatorios antes del cierre y tareas nuevas ----
+    var avisarCierre: Boolean
+        get() = prefs.getBoolean("notif_cierre", true)
+        set(v) { prefs.edit().putBoolean("notif_cierre", v).apply() }
+    var avisarNuevas: Boolean
+        get() = prefs.getBoolean("notif_nuevas", true)
+        set(v) { prefs.edit().putBoolean("notif_nuevas", v).apply() }
+
+    fun programarAvisos() {
+        WorkManager.getInstance(app).enqueueUniquePeriodicWork("avisos", ExistingPeriodicWorkPolicy.KEEP,
+            PeriodicWorkRequestBuilder<AvisosWorker>(1, java.util.concurrent.TimeUnit.HOURS).build())
+    }
+
+    /** Desde segundo plano: actualiza tareas si hay internet y revisa qué avisar. */
+    internal fun revisarEnSegundoPlano() {
+        if (!sesionIniciada) return
+        if (hayInternet()) runCatching { descargarTareas() }.onFailure { revisarAvisos() } else revisarAvisos()
+    }
+
+    @Synchronized private fun revisarAvisos() {
+        val ahora = System.currentTimeMillis()
+        val l = tareas.value
+        // Tareas nuevas: la primera vez solo se memorizan, para no avisar de las que ya existían.
+        val conocidas = prefs.getStringSet("conocidas", null)
+        val ids = l.map { "${it.cursoId}:${it.id}" }.toSet()
+        if (conocidas != null && avisarNuevas) l.filter { "${it.cursoId}:${it.id}" !in conocidas &&
+            (it.estado == EstadoTarea.PENDIENTE || it.estado == EstadoTarea.POR_INICIAR) }.take(5).forEach { Notificar.nueva(app, it) }
+        prefs.edit().putStringSet("conocidas", ids + (conocidas ?: emptySet())).apply()
+        // Recordatorios: 24 h y 2 h antes del cierre, una sola vez cada uno.
+        if (!avisarCierre) return
+        val avisadas = prefs.getStringSet("avisadas", emptySet())!!.toMutableSet()
+        for (t in l) {
+            if (t.estado != EstadoTarea.PENDIENTE) continue
+            val fin = t.fin ?: continue
+            val falta = fin - ahora
+            if (falta <= 0) continue
+            val clave = when { falta <= 2 * 3_600_000L -> "2h"; falta <= 24 * 3_600_000L -> "24h"; else -> continue }
+            val k = "${t.cursoId}:${t.id}:$clave"
+            if (k in avisadas) continue
+            avisadas += k; avisadas += "${t.cursoId}:${t.id}:24h"
+            Notificar.cierre(app, t, falta)
+        }
+        prefs.edit().putStringSet("avisadas", avisadas).apply()
     }
 
     fun guardarHorario(l: List<Clase>) { horario.value = l; escribir("horario.json", l.toJsonArray { it.toJson() }.toString()) }
@@ -192,6 +247,14 @@ object Repo {
         WorkManager.getInstance(app).enqueueUniqueWork(id, ExistingWorkPolicy.REPLACE,
             OneTimeWorkRequestBuilder<EntregaWorker>().setInputData(workDataOf("id" to id))
                 .setConstraints(Constraints(requiredNetworkType = NetworkType.CONNECTED)).build())
+    }
+}
+
+class AvisosWorker(c: Context, p: WorkerParameters) : CoroutineWorker(c, p) {
+    override suspend fun doWork(): Result {
+        Repo.init(applicationContext)
+        Repo.revisarEnSegundoPlano()
+        return Result.success()
     }
 }
 

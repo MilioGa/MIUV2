@@ -7,7 +7,7 @@
 **Tu UV en el bolsillo.**
 Tareas de Eminus, horario, calendario escolar y credencial digital en una sola app, con o sin internet.
 
-![Versión](https://img.shields.io/badge/versión-2.0-1B4DA0?style=flat-square)
+![Versión](https://img.shields.io/badge/versión-2.1-1B4DA0?style=flat-square)
 ![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?style=flat-square&logo=kotlin&logoColor=white)
 ![Compose](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?style=flat-square&logo=jetpackcompose&logoColor=white)
@@ -34,6 +34,7 @@ Tareas de Eminus, horario, calendario escolar y credencial digital en una sola a
 - **Entrega desde la app**: elige el archivo, agrega un comentario y listo
 - Reconoce las **entregas en equipo**
 - **Cola sin internet**: se envía sola al reconectar y te avisa
+- **Recordatorio** 24 h y 2 h antes del cierre, y aviso de **tareas nuevas**
 - Nunca borra ni reemplaza una entrega ya hecha
 
 </td>
